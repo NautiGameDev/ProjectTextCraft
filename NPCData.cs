@@ -157,7 +157,14 @@ public class NPCData : ScriptableObject
     public int[] ResolveDamage(int dmg)
     {
         Debug.Log("Resolving damage against NPC");
-        npcCurrentHealth -= dmg;
+        int armor = 0;
+        foreach (ItemData item in equipment)
+        {
+            armor += item.ArmorModifier;
+        }
+
+
+        npcCurrentHealth -= dmg - armor;
 
         if (npcCurrentHealth < 0)
         {
@@ -187,6 +194,29 @@ public class NPCData : ScriptableObject
     public int GetCurrentHealth()
     {
         return npcCurrentHealth;
+    }
+
+    public int GetWeaponDice()
+    {
+        int diceToRoll = 0;
+
+        foreach (ItemData item in equipment)
+        {
+            diceToRoll += item.GetDiceQuantity();
+        }
+
+        return diceToRoll;
+    }
+
+    public int GetArmorStat()
+    {
+        int armor = 0;
+        foreach (ItemData item in equipment)
+        {
+            armor += item.ArmorModifier;
+        }
+
+        return armor;
     }
 
     public List<ItemData> GetRandomLoot()

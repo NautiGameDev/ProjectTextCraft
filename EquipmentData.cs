@@ -25,6 +25,7 @@ public class EquipmentData
     ItemData necklaceSlot = null;
 
     float currentWeight;
+    int armorStat = 0;
 
     int strengthModifier;
     int dexterityModifier;
@@ -87,73 +88,69 @@ public class EquipmentData
         {
             case ItemData.equipableSlot.HEAD:
                 headSlot = item;
-                currentWeight += item.weight_kg;
                 break;
                 
             case ItemData.equipableSlot.SHOULDERS:
                 shouldersSlot = item;
-                currentWeight += item.weight_kg;
                 break;
             
             case ItemData.equipableSlot.CHEST:
                 chestSlot = item;
-                currentWeight += item.weight_kg;
                 break;
                 
             case ItemData.equipableSlot.WAIST:
                 beltSlot = item;
-                currentWeight += item.weight_kg;
                 break;
             
             case ItemData.equipableSlot.LEGS:
                 legsSlot = item;
-                currentWeight += item.weight_kg;
                 break;
 
             case ItemData.equipableSlot.FEET:
                 bootSlot = item;
-                currentWeight += item.weight_kg;
                 break;
 
             case ItemData.equipableSlot.HANDS:
                 glovesSlot = item;
-                currentWeight += item.weight_kg;
                 break;
 
             case ItemData.equipableSlot.WRIST:
                 wristSlot = item;
-                currentWeight += item.weight_kg;
                 break;
 
             case ItemData.equipableSlot.MAINHAND:
                 mainHandSlot = item;
-                currentWeight += item.weight_kg;
                 break;
 
             case ItemData.equipableSlot.FINGER:  //Need logic here to check for empty finger slot
                 mainHandRingSlot = item;
-                currentWeight += item.weight_kg;
                 break;
 
             case ItemData.equipableSlot.OFFHAND:
                 offHandSlot = item;
-                currentWeight += item.weight_kg;
                 break;
             
             case ItemData.equipableSlot.NECK:
                 necklaceSlot = item;
-                currentWeight += item.weight_kg;
                 break;
 
             default:
                 Debug.Log("Item " + item.entityName + " couldn't be equipped.");
                 break;
         }
+
+        currentWeight += item.weight_kg;
+        armorStat += item.ArmorModifier;
     }
 
     public float GetEquipmentWeight()
     {
         return currentWeight;
+    }
+
+    public int GetArmorStat()
+    {
+        return armorStat;
     }
 
     public string GetEquipedItems()

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    PlayerData playerData = new PlayerData("Nauti", 10, 10, 10, 10, 10, 10);
+    PlayerData playerData = new PlayerData("Nauti", 5, 5, 5, 5, 5, 5);
     InventoryData playerInventory = new InventoryData();
 
     EquipmentData playerEquipment = new EquipmentData();
@@ -55,6 +55,11 @@ public class Player : MonoBehaviour
         ItemData item = playerInventory.GetItemInInventory(target);
         return item;
     }
+
+    public string GetInventory()
+    {
+        return playerInventory.GetInventory();
+    }
 #endregion
 
 #region Equipment Methods
@@ -64,26 +69,24 @@ public class Player : MonoBehaviour
         playerEquipment.EquipItemToSlot(item);
     }
 
-#endregion
-
-#region set/get methods
-
-    public int GetDamage()
-    {
-        int dmg = playerData.GetMeleeDamage();
-        return dmg;
-    }
-
-    public string GetInventory()
-    {
-        return playerInventory.GetInventory();
-    }
-
     public string GetEquippedItems()
     {
         string equippedItems = playerEquipment.GetEquipedItems();
         return equippedItems;
     }
+
+    public ItemData GetEquippedItemInSlot(string slot)
+    {
+        ItemData item = playerEquipment.GetItemInSlot(slot);
+
+        return item;
+    }
+
+#endregion
+
+#region set/get methods
+
+
 
 #endregion
 
@@ -99,6 +102,17 @@ public class Player : MonoBehaviour
     {
         world.SetPosition(new Vector2Int(0,0));
         playerData.RespawnPlayer();
+    }
+
+    public int GetDamage()
+    {
+        int dmg = playerData.GetMeleeDamage();
+        return dmg;
+    }
+
+    public int GetArmorStat()
+    {
+        return playerEquipment.GetArmorStat();
     }
 
 #endregion 

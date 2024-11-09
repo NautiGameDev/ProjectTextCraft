@@ -580,9 +580,28 @@ public class ActionHandler : MonoBehaviour
                 
                 
                 //Resolve player damage against NPC and append message
-                int damage = player.GetDamage();
+                ItemData playerWeapon = player.GetEquippedItemInSlot("mainHand");
+                ItemData playerOffhand = player.GetEquippedItemInSlot("offHand");
+                
+                int rollDmg = 0;
+                int numbOfRolls = 0;
+
+                if (playerWeapon != null)
+                {
+                    numbOfRolls += playerWeapon.ATKDiceNumber;   
+                }
+
+                if (playerOffhand != null)
+                {
+                    numbOfRolls = playerOffhand.ATKDiceNumber;
+                }
+
+                rollDmg += RollWeaponDamage(numbOfRolls);
+                int baseDmg = player.GetDamage();
+
+                int damage = rollDmg +  baseDmg;
                 int[] npcHealth = npc.ResolveDamage(damage);
-                messageToReturn += "You attack the " + npc.entityName + " and deal " + damage + " damage.";
+                messageToReturn += "You attack the " + npc.entityName + " and deal " + (damage-npc.GetArmorStat()) + " damage.\n{Roll Damage[" + numbOfRolls + "d12]: " + rollDmg + "} + {Base Damage: " + baseDmg + "} - {Damage Blocked: " + npc.GetArmorStat() + "}\n\n";
                 
                 //If NPC is alive: Append attack string, get damage from NPC, append NPC attacking string, resolve damage against player.
                 //If NPC has died: Append string message describing NPC death
@@ -592,13 +611,18 @@ public class ActionHandler : MonoBehaviour
 
                 if (npcHealth[0] > 0)
                 {
-                    int targetDamage = npc.GetMeleeDamage();
-                    messageToReturn += npc.entityName + " retaliates against you and hits you for " + targetDamage + ".";
-                    playerHealth = player.ResolveDamage(targetDamage);
+                    int playerArmor = player.GetArmorStat();
+                    int npcDiceCount = npc.GetWeaponDice();
+                    int npcRollDmg = RollWeaponDamage(npcDiceCount);
+                    int npcBaseDmg = npc.GetMeleeDamage();
+                    int npcDamage = npcRollDmg + npcBaseDmg - playerArmor;
+
+                    messageToReturn += npc.entityName + " retaliates against you and hits you for " + npcDamage + ".\n{Roll Damage[" + npcDiceCount + "d12]: " + npcRollDmg + "} + {Base Damage: " + npcBaseDmg +"} - {Damage Blocked: " + playerArmor + ")\n";
+                    playerHealth = player.ResolveDamage(npcDamage);
                 }
                 else
                 {
-                    messageToReturn += "It dies with a final breath, and its' lifeless corpse falls to the ground.";
+                    messageToReturn += "\nIt dies with a final breath, and its' lifeless corpse falls to the ground.";
                     world.RemoveNPCFromChunk(npc);
                     world.AddNPCToChunk(npc.corpseObj);
                     playerHealth = player.ResolveDamage(0);
@@ -607,7 +631,7 @@ public class ActionHandler : MonoBehaviour
                 //Player death logic
                 if (playerHealth[0] < 0)
                 {
-                    messageToReturn += "The pain is too much to take. You have been deceased.";
+                    messageToReturn += "\nThe pain is too much to take. You have been deceased.";
                     player.RespawnPlayer();
                     messageToReturn += "You respawn at your last saved respawn point.";
 
@@ -705,6 +729,19 @@ public class ActionHandler : MonoBehaviour
     
 
 #endregion
+
+    int RollWeaponDamage(int numbOfRolls)
+    {
+        int damage = 0;
+
+        for (int i=0; i< numbOfRolls; i++)
+        {
+            int randDmg = UnityEngine.Random.Range(1, 12);
+            damage += randDmg;
+        }
+
+        return damage;
+    }
 
 #region Get Entities
     EnvironmentData GetEnvironmentObj(string target, ChunkData currentChunk)
