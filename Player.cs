@@ -64,9 +64,22 @@ public class Player : MonoBehaviour
 
 #region Equipment Methods
 
-    public void EquipItem(ItemData item)
+    public string EquipItem(ItemData item)
     {
-        playerEquipment.EquipItemToSlot(item);
+        return playerEquipment.EquipItemToSlot(item);
+    }
+
+    public ItemData UnequipItem(string target)
+    {
+        ItemData item = playerEquipment.UnequipItemFromSlot(target);
+        return item;
+
+    }
+
+    public ItemData GetItemEquipped(string target)
+    {
+        ItemData item = playerEquipment.GetItemEquiped(target);
+        return item;
     }
 
     public string GetEquippedItems()

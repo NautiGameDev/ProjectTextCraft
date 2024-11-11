@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 /*
@@ -10,137 +11,266 @@ Class keeps track of total weight of inventory as items are added/removed.
 
 public class EquipmentData
 {
-    ItemData headSlot = null;
-    ItemData chestSlot = null;
-    ItemData shouldersSlot = null;
-    ItemData beltSlot = null;
-    ItemData bootSlot = null;
-    ItemData legsSlot = null;
-    ItemData wristSlot = null;
-    ItemData glovesSlot = null;
-    ItemData mainHandSlot = null;
-    ItemData offHandSlot = null;
-    ItemData mainHandRingSlot = null;
-    ItemData offHandRingSlot = null;
-    ItemData necklaceSlot = null;
+    // ItemData headSlot = null;
+    // ItemData chestSlot = null;
+    // ItemData shouldersSlot = null;
+    // ItemData beltSlot = null;
+    // ItemData bootSlot = null;
+    // ItemData legsSlot = null;
+    // ItemData wristSlot = null;
+    // ItemData glovesSlot = null;
+    // ItemData mainHandSlot = null;
+    // ItemData offHandSlot = null;
+    // ItemData mainHandRingSlot = null;
+    // ItemData offHandRingSlot = null;
+    // ItemData necklaceSlot = null;
+
+    Dictionary<string, ItemData> equippedItems = new Dictionary<string, ItemData> 
+    { 
+        {"HeadSlot", null},
+        {"ChestSlot", null},
+        {"ShouldersSlot", null},
+        {"HandSlot", null},
+        {"WristSlot", null},
+        {"WaistSlot", null},
+        {"LegsSlot", null},
+        {"FeetSlot", null},
+        {"MainHandSlot", null},
+        {"OffHandSlot", null},
+        {"MainHandRingSlot", null},
+        {"OffHandRingSlot", null},
+        {"NeckSlot", null}
+    };
 
     float currentWeight;
-    int armorStat = 0;
-
-    int strengthModifier;
-    int dexterityModifier;
-    int constitutionModifier;
-    int intelligenceModifier;
-    int wisdomModifier;
-    int charismaModifier;
+    
+    Dictionary<string, int> equipmentModifiers = new Dictionary<string, int>() 
+    {
+        {"Armor", 0},
+        {"Strength", 0},
+        {"Dexterity", 0},
+        {"Constitution", 0},
+        {"Intelligence", 0},
+        {"Charisma", 0}
+    };
 
     public ItemData GetItemInSlot(string slot)
     {
-        switch(slot)
-        {
-            case "head":
-                return headSlot;
-                
-            case "shoulders":
-                return shouldersSlot;
-            
-            case "chest":
-                return chestSlot;
-                
-            case "belt":
-                return beltSlot;
-            
-            case "legs":
-                return legsSlot;
-
-            case "boots":
-                return bootSlot;
-
-            case "gloves":
-                return glovesSlot;
-
-            case "wrist":
-                return wristSlot;
-
-            case "mainHand":
-                return mainHandSlot;
-
-            case "mainHandRing":
-                return mainHandRingSlot;
-
-            case "offHand":
-                return offHandSlot;
-            
-            case "offHandRing":
-                return offHandRingSlot;
-
-            case "amulet":
-                return necklaceSlot;
-
-            default:
-                return null;
-        }
+        return equippedItems[slot];
     }
 
-    public void EquipItemToSlot(ItemData item)
+    public string EquipItemToSlot(ItemData item) //Update to return bool to prevent bugs on equip item error
     {
         switch(item.entitySlot)
         {
             case ItemData.equipableSlot.HEAD:
-                headSlot = item;
-                break;
+                if (equippedItems["HeadSlot"] == null)
+                {
+                    equippedItems["HeadSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + "to your head slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your head slot";
+                }
                 
             case ItemData.equipableSlot.SHOULDERS:
-                shouldersSlot = item;
-                break;
+                if (equippedItems["ShoulderSlot"] == null)
+                {
+                    equippedItems["ShoulderSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your shoulders slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your shoulders slot.";
+                }
             
             case ItemData.equipableSlot.CHEST:
-                chestSlot = item;
-                break;
+                if (equippedItems["ChestSlot"] == null)
+                {
+                    equippedItems["ChestSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your chest slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your chest slot.";
+                }
+                
                 
             case ItemData.equipableSlot.WAIST:
-                beltSlot = item;
-                break;
+                if (equippedItems["WaistSlot"] == null)
+                {
+                    equippedItems["WaistSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your waist slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your waist slot.";
+                }
+                
             
             case ItemData.equipableSlot.LEGS:
-                legsSlot = item;
-                break;
+                if (equippedItems["LegsSlot"] == null)
+                {
+                    equippedItems["LegsSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your legs slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your legs slot.";
+                }
 
             case ItemData.equipableSlot.FEET:
-                bootSlot = item;
-                break;
+                if (equippedItems["FeetSlot"] == null)
+                {
+                    equippedItems["FeetSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your feet slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your feet slot.";
+                }
 
             case ItemData.equipableSlot.HANDS:
-                glovesSlot = item;
-                break;
+                
+                if (equippedItems["HandSlot"] == null)
+                {
+                    equippedItems["HandSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your hands slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your hands slot.";
+                }
 
             case ItemData.equipableSlot.WRIST:
-                wristSlot = item;
-                break;
+                if (equippedItems["WristSlot"] == null)
+                {
+                    equippedItems["WristSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your wrist slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your wrist slot.";
+                }
+                
 
             case ItemData.equipableSlot.MAINHAND:
-                mainHandSlot = item;
-                break;
+                if (equippedItems["MainHandSlot"]==null)
+                {
+                    equippedItems["MainHandSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your main hand slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your main hand slot.";
+                }
 
             case ItemData.equipableSlot.FINGER:  //Need logic here to check for empty finger slot
-                mainHandRingSlot = item;
-                break;
+                if (equippedItems["MainHandRingSlot"] == null)
+                {
+                    equippedItems["MainHandRingSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your main hand ring finger.";
+                }
+                else if (equippedItems["OffHandRingSlot"] == null)
+                {
+                    equippedItems["OffHandRingSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your off hand ring finger.";
+                }
+                else
+                {
+                    return "You don't have an empty ring finger to equip " + item.entityName;
+                }
 
             case ItemData.equipableSlot.OFFHAND:
-                offHandSlot = item;
-                break;
+                if (equippedItems["OffHandSlot"] == null)
+                {
+                    equippedItems["OffHandSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your off hand slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your off hand slot.";
+                }
             
             case ItemData.equipableSlot.NECK:
-                necklaceSlot = item;
-                break;
+                if (equippedItems["NeckSlot"] == null)
+                {
+                    equippedItems["NeckSlot"] = item;
+                    UpdateEquipmentModifiers(item, "add");
+                    return "You equip the " + item.entityName + " to your neck slot.";
+                }
+                else
+                {
+                    return "You already have an item equipped to your neck slot.";
+                }
 
             default:
-                Debug.Log("Item " + item.entityName + " couldn't be equipped.");
+                Debug.Log(item.entityName + " couldn't be equipped.");
                 break;
         }
 
-        currentWeight += item.weight_kg;
-        armorStat += item.ArmorModifier;
+        return "Could not equip " + item.entityName; 
+    }
+
+    public ItemData UnequipItemFromSlot(string target)
+    {
+        foreach (string slot in equippedItems.Keys)
+        {
+            if (equippedItems[slot].entityName.ToLower() == target)
+            {
+                ItemData item = equippedItems[slot];
+                equippedItems[slot] = null;
+                return item;
+            }
+        }
+        
+        return null;
+    }
+
+    public ItemData GetItemEquiped(string target)
+    {
+        foreach (string slot in equippedItems.Keys)
+        {
+            if (equippedItems[slot].entityName.ToLower() == target)
+            {
+                ItemData item = equippedItems[slot];
+                return item;
+            }
+        }
+        
+        return null;
+    }
+
+    public void UpdateEquipmentModifiers(ItemData item, string command)
+    {
+        if (command == "add")
+        {
+            foreach (string modifier in item.itemModifiers.Keys)
+            {
+                equipmentModifiers[modifier] += item.itemModifiers[modifier];
+            }
+        }
+
+        if (command == "remove")
+        {
+            foreach (string modifier in item.itemModifiers.Keys)
+            {
+                equipmentModifiers[modifier] -= item.itemModifiers[modifier];
+            }
+        }
     }
 
     public float GetEquipmentWeight()
@@ -150,146 +280,18 @@ public class EquipmentData
 
     public int GetArmorStat()
     {
-        return armorStat;
+        return equipmentModifiers["Armor"];
     }
 
     public string GetEquipedItems()
     {
-        string equippedItems = "-=Equipped Items=-";
-        
-        if (mainHandSlot != null)
-        {
-            equippedItems += "\nMain Hand: " + mainHandSlot.entityName;
-        }
-        else if (mainHandSlot == null)
-        {
-            equippedItems += "\nMain Hand: empty";
-        }
+        string messageToReturn = "Equipped Items:";
 
-        if (offHandSlot != null)
+        foreach (string slot in equippedItems.Keys)
         {
-            equippedItems += "\nOff Hand: " + offHandSlot.entityName;
-        }
-        else if (offHandSlot == null)
-        {
-            equippedItems += "\nOff Hand: empty";
-        }
-
-        if (headSlot != null)
-        {
-            equippedItems += "\nHead: " + headSlot.entityName;
-        }
-        else if (headSlot == null)
-        {
-            equippedItems += "\nHead: empty";
-        }
-
-        if (shouldersSlot != null)
-        {
-            equippedItems += "\nShoulders: " + shouldersSlot.entityName;
-        }
-        else if (shouldersSlot == null)
-        {
-            equippedItems += "\nShoulders: empty";
-        }
-
-        if (chestSlot != null)
-        {
-            equippedItems += "\nChest: " + chestSlot.entityName;
-        }
-        else if (chestSlot == null)
-        {
-            equippedItems += "\nChest: empty";
-        }
-
-        if (glovesSlot != null)
-        {
-            equippedItems += "\nGloves: " + glovesSlot.entityName;
-        }
-        else if (glovesSlot == null)
-        {
-            equippedItems += "\nGloves: empty";
-        }
-
-        if (wristSlot != null)
-        {
-            equippedItems += "\nWrist: " + wristSlot.entityName;
-        }
-        else if (wristSlot == null)
-        {
-            equippedItems += "\nWrist: empty";
+            messageToReturn += "\n" + slot + ": " + equippedItems[slot].entityName;
         }
         
-        if (beltSlot != null)
-        {
-            equippedItems += "\nWaist: " + beltSlot.entityName;
-        }
-        else if (beltSlot == null)
-        {
-            equippedItems += "\nWaist: empty";
-        }
-
-        if (legsSlot != null)
-        {
-            equippedItems += "\nLegs: " + legsSlot.entityName;
-        }
-        else if (legsSlot == null)
-        {
-            equippedItems += "\nLegs: empty";
-        }
-
-        if (bootSlot != null)
-        {
-            equippedItems += "\nBoots: " + bootSlot.entityName;
-        }
-        else if (bootSlot == null)
-        {
-            equippedItems += "\nBoots: empty";
-        }
-        
-        if (mainHandRingSlot != null)
-        {
-            equippedItems += "\nRing(Main Hand): " + mainHandRingSlot.entityName;
-        }
-        else if (mainHandRingSlot == null)
-        {
-            equippedItems += "\nRing(Main Hand): empty";
-        }
-
-        if (offHandRingSlot != null)
-        {
-            equippedItems += "\nRing(Off Hand): " + offHandRingSlot.entityName;
-        }
-        else if (offHandRingSlot == null)
-        {
-            equippedItems += "\nRing(Off Hand): empty";
-        }
-
-        if (necklaceSlot != null)
-        {
-            equippedItems += "\nAmulet: " + necklaceSlot.entityName;
-        }
-        else if (necklaceSlot == null)
-        {
-            equippedItems += "\nAmulet: empty";
-        }
-
-
-        return equippedItems;
+        return messageToReturn;
     }
-
-    public Dictionary<string, int> GetModifiers()
-    {
-        Dictionary<string, int> modifierDict = new Dictionary<string, int>();
-
-        modifierDict.Add("str", strengthModifier);
-        modifierDict.Add("dex", dexterityModifier);
-        modifierDict.Add("int", intelligenceModifier);
-        modifierDict.Add("wis", wisdomModifier);
-        modifierDict.Add("con", constitutionModifier);
-        modifierDict.Add("cha", charismaModifier);
-
-        return modifierDict;
-    }
-
 }

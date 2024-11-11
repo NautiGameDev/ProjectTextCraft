@@ -84,6 +84,10 @@ public class ActionHandler : MonoBehaviour
                 newMessage += Process_HarvestGather(parsedInput);
                 break;
 
+            case "take":
+                newMessage += Process_HarvestGather(parsedInput);
+                break;
+
             case "loot":
                 newMessage += Process_Loot(parsedInput);
                 break;
@@ -152,6 +156,10 @@ public class ActionHandler : MonoBehaviour
 
                 break;
 
+            case "drop":
+
+                break;
+
     #endregion
 
     #region equipment management
@@ -162,6 +170,11 @@ public class ActionHandler : MonoBehaviour
             case "wear":
                 newMessage += Process_EquipWear(parsedInput);
                 break;
+
+            case "unequip":
+                newMessage += Process_Unequip(parsedInput);
+                break;
+
     #endregion
 
         }
@@ -324,6 +337,25 @@ public class ActionHandler : MonoBehaviour
         return amendedMessage;
     }
 
+    string Process_Unequip(string[] parsedInput)
+    {
+        string messageToReturn = "";
+
+       if (parsedInput.Length == 1)
+       {
+            messageToReturn += parsedInput[0] + " what?";
+       }
+
+       else if (parsedInput.Length >= 2)
+       {
+            string target = parsedInput[1] + " " + parsedInput[2];
+            messageToReturn += Action_Unequip(target);
+       }
+
+
+        return messageToReturn;
+    }
+
     string Process_Loot(string[] parsedInput)
     {
         string amendedMessage = "";
@@ -336,7 +368,7 @@ public class ActionHandler : MonoBehaviour
         }
         else if (parsedInput.Length == 2)
         {
-            target += parsedInput[1];
+            target += parsedInput[1] + " corpse";
             amendedMessage += Action_Loot(target);
         }
         else if (parsedInput.Length == 1)
@@ -496,6 +528,9 @@ public class ActionHandler : MonoBehaviour
             messageToReturn += itemInInventory.GetInspectMessage();
             return messageToReturn;
         }
+
+        ItemData itemInEquipment = GetItemInEquipment(target);
+
 
         messageToReturn += "There doesn't seem to be a " + target + " in the area.";
         return messageToReturn = "";
@@ -694,6 +729,8 @@ public class ActionHandler : MonoBehaviour
         }
         else
         {
+            string[] targetArray = target.Split(" ");
+            if (targetArray[1] == "corpse") target = targetArray[0];
             messageToReturn += "There isn't a " + target + " in the area.";
         }
 
@@ -709,9 +746,8 @@ public class ActionHandler : MonoBehaviour
 
         if (itemInInventory != null && itemInInventory.entityType == ItemData.entTypes.EQUIPABLE)
         {
-            player.EquipItem(itemInInventory);
+            messageToReturn += player.EquipItem(itemInInventory);
             player.RemoveItemFromInventory(target);
-            messageToReturn += "You equip the " + target;
         }
         else if (itemInInventory != null && itemInInventory.entityType != ItemData.entTypes.EQUIPABLE)
         {
@@ -726,13 +762,32 @@ public class ActionHandler : MonoBehaviour
         return messageToReturn;
     }
 
-    
+    string Action_Unequip(string target)
+    {
+        string messageToReturn = "";
+
+        ItemData item = player.UnequipItem(target);
+
+        if (item != null)
+        {
+            messageToReturn += item.entityName + " has been unequiped.";
+            messageToReturn += player.AddItemToInventory(item);
+        }
+        else
+        {
+            messageToReturn += "You don't have a " + target + " equipped.";
+        }
+
+        return messageToReturn;
+    }
 
 #endregion
 
     int RollWeaponDamage(int numbOfRolls)
     {
         int damage = 0;
+
+        if (numbOfRolls == 0) numbOfRolls = 1;
 
         for (int i=0; i< numbOfRolls; i++)
         {
@@ -771,6 +826,12 @@ public class ActionHandler : MonoBehaviour
     ItemData GetItemInInventory(string target)
     {
         ItemData item = player.GetItemFromInventory(target);
+        return item;
+    }
+
+    ItemData GetItemInEquipment(string target)
+    {
+        ItemData item = player.GetItemEquipped(target);
         return item;
     }
 

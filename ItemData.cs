@@ -18,16 +18,18 @@ public class ItemData : ScriptableObject
     public equipableSlot entitySlot;
     public float weight_kg;
 
-    public int itemConstitutionModifier;
-    public int itemStrengthModifier;
-    public int itemDexterityModifier;
-    public int itemIntelligenceModifier;
-    public int itemWisdomModifier;
-    public int itemCharismaModifier;
+    public Dictionary<string, int> itemModifiers = new Dictionary<string, int>() 
+    {
+        {"Armor", 0},
+        {"Strength", 0},
+        {"Dexterity", 0},
+        {"Constitution", 0},
+        {"Intelligence", 0},
+        {"Charisma", 0}
+    };
 
     public int ATKDiceNumber;
-    public int ArmorModifier;
-
+    
     
     public string[] attackMessages;
     public string[] listenMessages;
@@ -42,7 +44,7 @@ public class ItemData : ScriptableObject
 
     public int GetArmorQuantity()
     {
-        return ArmorModifier;
+        return itemModifiers["Armor"];
     }
 
     public string GetGatherMessage()
