@@ -12,56 +12,60 @@ Methods will allow removal and addition of entities that are used dynamically
 
 public class ChunkData
 {
+    public string biomeName;
     public Vector2Int chunkPosition;
     float altitude;
-    float moisture;
+    float humidity;
     float temperature;
-    public string biome;
-    string[] descriptions;
-    public List<NPCData> storedNPCs = new List<NPCData>();
-    public List<ItemData> storedItems = new List<ItemData>();
-    public List<EnvironmentData> storedEnvironmentObj = new List<EnvironmentData>();
+    
+    public string[] descriptions;
+    public List<NPCEntity> storedNPCs = new List<NPCEntity>();
+    public List<ItemEntity> storedItems = new List<ItemEntity>();
+    public List<EnvironmentEntity> storedEnvironmentObj = new List<EnvironmentEntity>();
 
-    public ChunkData(Vector2Int worldPosition, string chunkBiome, string[] biomeDescriptions)
+    public ChunkData(Vector2Int worldPosition, BiomeEntity currentBiome)
     {
+        Debug.Log("Chunk created at " + worldPosition);
         chunkPosition = worldPosition;
-        biome = chunkBiome;
-        descriptions = biomeDescriptions;
+        biomeName = currentBiome.biomeName;
+        altitude = currentBiome.altitude;
+        temperature = currentBiome.temperature;
+        humidity = currentBiome.humidty;
+        descriptions = currentBiome.descriptions;
     }
 
 #region Add/Remove Items in World
-    public void AddNPCToList(NPCData npc)
+    public void AddNPCToList(NPCEntity npc)
     {
         storedNPCs.Add(npc);
-        npc.UpdateDynamicStats();
     }
 
-    public void AddItemToDictionary(ItemData item)
+    public void AddItemToList(ItemEntity item)
     {
         storedItems.Add(item);
     }
 
-    public void AddEnvironmentToDictionary(EnvironmentData environment)
+    public void AddEnvironmentToList(EnvironmentEntity environment)
     {
         storedEnvironmentObj.Add(environment);
     }
 
-    public void RemoveItemFromDictionary(ItemData targetItem)
+    public void RemoveItemFromList(ItemEntity targetItem)
     {
-        foreach (ItemData item in storedItems)
+        foreach (ItemEntity item in storedItems)
         {
             if (item.entityName == targetItem.entityName)
             {
-                Debug.Log(item + " removed from chunk.");
+                Debug.Log(item.entityName + " removed from chunk.");
                 storedItems.Remove(item);
                 break;
             }
         }
     }
 
-    public void RemoveNPCFromDictionary(NPCData targetNPC)
+    public void RemoveNPCFromList(NPCEntity targetNPC)
     {
-        foreach (NPCData npc in storedNPCs)
+        foreach (NPCEntity npc in storedNPCs)
         {
             if (npc.entityName == targetNPC.entityName)
             {
@@ -80,9 +84,9 @@ public class ChunkData
     }
 
 #region Get Entities In Chunk Methods
-    public NPCData GetTargetNPC(string target)
+    public NPCEntity GetTargetNPC(string target)
     {
-        foreach (NPCData npc in storedNPCs)
+        foreach (NPCEntity npc in storedNPCs)
         {
             if (npc.entityName.ToLower() == target)
             {
@@ -93,9 +97,9 @@ public class ChunkData
         return null;
     }
 
-    public ItemData GetTargetItem(string target)
+    public ItemEntity GetTargetItem(string target)
     {
-        foreach (ItemData item in storedItems)
+        foreach (ItemEntity item in storedItems)
         {
             if (item.entityName.ToLower() == target)
             {
@@ -106,9 +110,9 @@ public class ChunkData
         return null;
     }
 
-    public EnvironmentData GetTargetEnvironmentObj(string target)
+    public EnvironmentEntity GetTargetEnvironmentObj(string target)
     {
-        foreach (EnvironmentData obj in storedEnvironmentObj)
+        foreach (EnvironmentEntity obj in storedEnvironmentObj)
         {
             if (obj.entityName.ToLower() == target)
             {

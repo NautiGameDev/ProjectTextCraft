@@ -13,7 +13,7 @@ Key ring dictionary stores player keys to access locked doors and chests.
 
 public class InventoryData
 {
-    Dictionary<ItemData, int> inventoryDict = new Dictionary<ItemData, int>();
+    Dictionary<ItemEntity, int> inventoryDict = new Dictionary<ItemEntity, int>();
 
     float currentWeight;
 
@@ -22,7 +22,7 @@ public class InventoryData
         return currentWeight;
     }
 
-    public void PlaceItemInInventory(ItemData item)
+    public void PlaceItemInInventory(ItemEntity item)
     {
         if (!inventoryDict.ContainsKey(item))
         {
@@ -38,7 +38,7 @@ public class InventoryData
 
     public void RemoveItemInInventory(string target)
     {
-        foreach (ItemData item in inventoryDict.Keys)
+        foreach (ItemEntity item in inventoryDict.Keys)
         {
             if (item.entityName.ToLower() == target)
             {
@@ -48,16 +48,16 @@ public class InventoryData
         }
     }
 
-    public ItemData GetItemInInventory(string target)
+    public ItemEntity GetItemInInventory(string target)
     {
         Debug.Log("Inventory Method: Get Item From Inventory: " + target);
 
 
-        foreach (ItemData obj in inventoryDict.Keys)
+        foreach (ItemEntity item in inventoryDict.Keys)
         {
-            if (obj.entityName.ToLower() == target)
+            if (item.entityName.ToLower() == target)
             {
-                return obj;
+                return item;
             }
         }
 
@@ -73,9 +73,9 @@ public class InventoryData
 
         string inventoryString = "Current Inventory:";
 
-        foreach (ItemData obj in inventoryDict.Keys)
+        foreach (ItemEntity item in inventoryDict.Keys)
         {
-            inventoryString += "\n" + obj.entityName + " x" + inventoryDict[obj];
+            inventoryString += "\n" + item.entityName + " x" + inventoryDict[item];
         }
 
         return inventoryString;

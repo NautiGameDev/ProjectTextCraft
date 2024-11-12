@@ -4,240 +4,44 @@ using System.Security.Cryptography;
 using UnityEngine;
 
 /*
-Handles core data for NPC types. Ex: Goblin Archer, Dwarf Civilian, Etc.
-These values are used to generate NPC class in world.
+Stores dictionaries of all NPC data.
+Items in droptable and equipment are split by "/" when instantiating NPC entity. Upon death, all equipment is lootable by the player.
+Items in drop table are randomly chosen to be looted by the player based on probability, and is noted by %numb next to the item's name.
+    When choosing an item to give to player, a random float is generated between 0 and 1. The item with the next probability above the
+    random float is given. Example: a 0.32 roll will give an item that has 0.4 probability if no other item probabilities exist between 0.32 and 0.4.
+    
 */
 
-[CreateAssetMenu(fileName ="NPC Data" ,menuName ="Data/NPC Data")]
-public class NPCData : ScriptableObject
+public class NPCData
 {
-    public enum NPCState {ALIVE, DEAD}
-    public NPCState currentState = NPCState.ALIVE;
 
-    //EquipmentData npcInventory = new EquipmentData();
-
-    public string entityName;
-    public string npcRace;
-    public int npcAge;
-
-    public string npcSex;
-
-    public string npcSkinTone;
-    public string npcHairColor;
-    public string npcHairType;
-    public string npcEyeColor;
-    public string npcFacialHair;
-
-    //Base stats
-    public int npcConstitution;
-    public int npcStrength;
-    public int npcDexterity;
-    public int npcIntelligence;
-    public int npcWisdom;
-    public int npcCharisma;
-
-    //Dynamic stats
-    int npcMaxHealth;
-    int npcCurrentHealth;
-    int npcMeleeDamage;
-    int npcRangeDamage;
-    int npcMagicDamage;
-
-    public ItemData[] dropTable;
-    public ItemData[] equipment;
-
-    public NPCData corpseObj;
-
-    public string[] attackMessages;
-    public string[] listenMessages;
-    public string[] inspectMessages;
-    public string[] gatherMessages;
-    public string[] lootMessages;
-
-
-#region methods to update dynamic stats
-    public void UpdateDynamicStats()
+    public Dictionary<string, Dictionary<string, string>> NPCDict = new Dictionary<string, Dictionary<string, string>>()
     {
-        //Get base stats at character creation in world
-        CalculateHealth();
-        CalculateMeleeDamage();
-        CalculateRangedDamage();
-        CalculateMagicDamage();
-    }
-
-    void CalculateHealth()
-    {
-        //NPC starts at a base HP determined by class.
-        //For each point in constituion add 2hp to the NPC.
-        //Will need to add methods in future to get const modifiers from inventory
-
-        int baseHP = 15;
-        npcMaxHealth = baseHP + (npcConstitution * 1);
-        npcCurrentHealth = npcMaxHealth;
-        Debug.Log("NPC health: " + npcCurrentHealth);
-    }
-
-    void CalculateMeleeDamage()
-    {
-        //NPC starts with a base damage determined by race.
-        //For each point in strength add 2 melee damage to the NPC.
-        //Will need to add methods in future to get str modifiers from inventory
-
-        int baseDMG = 3;
-        npcMeleeDamage = baseDMG + (npcStrength * 1);
-    }
-
-    void CalculateRangedDamage()
-    {
-        //NPC starts with a base ranged damage determined by race.
-        //For each point in dexterity add 2 range damage to the NPC.
-        //Will need to add methods in the future to get dex modifiers from inventory.
-
-        int baseDMG = 3;
-        npcRangeDamage = baseDMG + (npcDexterity * 1);
-    }
-
-    void CalculateMagicDamage()
-    {
-        //Player starts with a base magic damage determined by race.
-        //For each point in intelligence add 2 magic damage to the player.
-        //Will need to add methods in the future to get int modifiers from inventory.
-
-        int baseDMG = 3;
-        npcMagicDamage = baseDMG + (npcIntelligence * 1);
-    }
-
-#endregion
-
-#region Message Getter methods
-    public string GetGatherMessage()
-    {
-        int randomChoice = UnityEngine.Random.Range(0, gatherMessages.Length-1);
-        return gatherMessages[randomChoice];
-    }
-
-    public string GetInspectMessage()
-    {
-        int randomChoice = UnityEngine.Random.Range(0, inspectMessages.Length-1);
-        return inspectMessages[randomChoice];
-    }
-
-    public string GetListenMessage()
-    {
-        int randomChoice = UnityEngine.Random.Range(0, listenMessages.Length-1);
-        return listenMessages[randomChoice];
-    }
-
-    public string GetAttackMessage()
-    {
-        int randomChoice = UnityEngine.Random.Range(0, attackMessages.Length-1);
-        return attackMessages[randomChoice];
-    }
-
-    public string GetLootMessage()
-    {
-        int randomChoice = UnityEngine.Random.Range(0, lootMessages.Length - 1);
-        return lootMessages[randomChoice];
-    }
-    
-#endregion
-
-#region Combat Methods
-
-    public bool IsAlive()
-    {
-        if (currentState==NPCState.ALIVE)
-        {
-            return true;
+        {"Goblin",
+            new Dictionary<string, string>()
+            {
+                {"EntityName", "Goblin"},
+                {"EntityRace", "Goblin"},
+                {"Constitution", "5"},
+                {"Strength", "5"},
+                {"Dexterity", "5"},
+                {"Intelligence", "5"},
+                {"Wisdom", "5"},
+                {"Charisma", "5"},
+                {"DropTable", ""},
+                {"Equipment", "Leather Leggings/Leather Shoulders/Leather Boots/Bronze Scimitar"},
+                {"AttackMessage", "The goblin grunts in agony."},
+                {"ListenMessage", "The goblin mumbles something in its' own language. You can't understand it."},
+                {"InspectMessage", "A small green creature with pointy ears. It's wearing leather pants, boots, and shoulder pads. In its' hand it maintains a firm grip on a bronze scimitar."},
+                {"GatherMessage", "Though small, the goblin isn't going to fit in your pack."},
+                {"LootMessage", "You can't loot the goblin while it's still alive."},
+                {"DeadAttackMessage", "The goblin is already dead. Attacking it won't accomplish anything."},
+                {"DeadListenMessage", "You listen to the dead goblin, but you don't hear anything"},
+                {"DeadInspectMessage", "A small green creature clearly deceased."},
+                {"DeadGatherMessage", "Though small, the goblin isn't going to fit in your pack."},
+                {"DeadLootMessage", "You rummage the Goblin's corpse and salvage any remaining items."}
+            }
         }
-
-        return false;
-    }
-
-    public int[] ResolveDamage(int dmg)
-    {
-        Debug.Log("Resolving damage against NPC");
-        int armor = 0;
-        foreach (ItemData item in equipment)
-        {
-            armor += item.ArmorModifier;
-        }
-
-
-        npcCurrentHealth -= dmg - armor;
-
-        if (npcCurrentHealth < 0)
-        {
-            npcCurrentHealth = 0;
-        }
-
-        int[] npcHealthStats = new int[] {npcCurrentHealth, npcMaxHealth};
-        return npcHealthStats;
-    }
-
-    public int GetMeleeDamage()
-    {
-        Debug.Log("Getting npc melee damage");
-        return npcMeleeDamage;
-    }
-
-    public int GetRangeDamage()
-    {
-        return npcRangeDamage;
-    }
-
-    public int GetMagicDamage()
-    {
-        return npcMagicDamage;
-    }
-
-    public int GetCurrentHealth()
-    {
-        return npcCurrentHealth;
-    }
-
-    public int GetWeaponDice()
-    {
-        int diceToRoll = 0;
-
-        foreach (ItemData item in equipment)
-        {
-            diceToRoll += item.GetDiceQuantity();
-        }
-
-        return diceToRoll;
-    }
-
-    public int GetArmorStat()
-    {
-        int armor = 0;
-        foreach (ItemData item in equipment)
-        {
-            armor += item.ArmorModifier;
-        }
-
-        return armor;
-    }
-
-    public List<ItemData> GetRandomLoot()
-    {
-        Debug.Log("Getting random loot from " + entityName);
-
-        List<ItemData> lootedItems = new List<ItemData>();
-
-        int randomNumb = UnityEngine.Random.Range(0, dropTable.Length - 1);
-        lootedItems.Add(dropTable[randomNumb]);
-
-        for (int i = 0; i < equipment.Length; i++)
-        {
-            lootedItems.Add(equipment[i]);
-            
-        }
-
-        return lootedItems;
-
-    }
-
-#endregion
+    };
 
 }

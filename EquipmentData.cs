@@ -11,21 +11,8 @@ Class keeps track of total weight of inventory as items are added/removed.
 
 public class EquipmentData
 {
-    // ItemData headSlot = null;
-    // ItemData chestSlot = null;
-    // ItemData shouldersSlot = null;
-    // ItemData beltSlot = null;
-    // ItemData bootSlot = null;
-    // ItemData legsSlot = null;
-    // ItemData wristSlot = null;
-    // ItemData glovesSlot = null;
-    // ItemData mainHandSlot = null;
-    // ItemData offHandSlot = null;
-    // ItemData mainHandRingSlot = null;
-    // ItemData offHandRingSlot = null;
-    // ItemData necklaceSlot = null;
 
-    Dictionary<string, ItemData> equippedItems = new Dictionary<string, ItemData> 
+    Dictionary<string, ItemEntity> equippedItems = new Dictionary<string, ItemEntity> 
     { 
         {"HeadSlot", null},
         {"ChestSlot", null},
@@ -54,16 +41,16 @@ public class EquipmentData
         {"Charisma", 0}
     };
 
-    public ItemData GetItemInSlot(string slot)
+    public ItemEntity GetItemInSlot(string slot)
     {
         return equippedItems[slot];
     }
 
-    public string EquipItemToSlot(ItemData item) //Update to return bool to prevent bugs on equip item error
+    public string EquipItemToSlot(ItemEntity item) //Update to return bool to prevent bugs on equip item error
     {
         switch(item.entitySlot)
         {
-            case ItemData.equipableSlot.HEAD:
+            case ItemEntity.equipableSlot.HEAD:
                 if (equippedItems["HeadSlot"] == null)
                 {
                     equippedItems["HeadSlot"] = item;
@@ -75,10 +62,10 @@ public class EquipmentData
                     return "You already have an item equipped to your head slot";
                 }
                 
-            case ItemData.equipableSlot.SHOULDERS:
-                if (equippedItems["ShoulderSlot"] == null)
+            case ItemEntity.equipableSlot.SHOULDERS:
+                if (equippedItems["ShouldersSlot"] == null)
                 {
-                    equippedItems["ShoulderSlot"] = item;
+                    equippedItems["ShouldersSlot"] = item;
                     UpdateEquipmentModifiers(item, "add");
                     return "You equip the " + item.entityName + " to your shoulders slot.";
                 }
@@ -87,7 +74,7 @@ public class EquipmentData
                     return "You already have an item equipped to your shoulders slot.";
                 }
             
-            case ItemData.equipableSlot.CHEST:
+            case ItemEntity.equipableSlot.CHEST:
                 if (equippedItems["ChestSlot"] == null)
                 {
                     equippedItems["ChestSlot"] = item;
@@ -100,7 +87,7 @@ public class EquipmentData
                 }
                 
                 
-            case ItemData.equipableSlot.WAIST:
+            case ItemEntity.equipableSlot.WAIST:
                 if (equippedItems["WaistSlot"] == null)
                 {
                     equippedItems["WaistSlot"] = item;
@@ -113,7 +100,7 @@ public class EquipmentData
                 }
                 
             
-            case ItemData.equipableSlot.LEGS:
+            case ItemEntity.equipableSlot.LEGS:
                 if (equippedItems["LegsSlot"] == null)
                 {
                     equippedItems["LegsSlot"] = item;
@@ -125,7 +112,7 @@ public class EquipmentData
                     return "You already have an item equipped to your legs slot.";
                 }
 
-            case ItemData.equipableSlot.FEET:
+            case ItemEntity.equipableSlot.FEET:
                 if (equippedItems["FeetSlot"] == null)
                 {
                     equippedItems["FeetSlot"] = item;
@@ -137,7 +124,7 @@ public class EquipmentData
                     return "You already have an item equipped to your feet slot.";
                 }
 
-            case ItemData.equipableSlot.HANDS:
+            case ItemEntity.equipableSlot.HANDS:
                 
                 if (equippedItems["HandSlot"] == null)
                 {
@@ -150,7 +137,7 @@ public class EquipmentData
                     return "You already have an item equipped to your hands slot.";
                 }
 
-            case ItemData.equipableSlot.WRIST:
+            case ItemEntity.equipableSlot.WRIST:
                 if (equippedItems["WristSlot"] == null)
                 {
                     equippedItems["WristSlot"] = item;
@@ -163,7 +150,7 @@ public class EquipmentData
                 }
                 
 
-            case ItemData.equipableSlot.MAINHAND:
+            case ItemEntity.equipableSlot.MAINHAND:
                 if (equippedItems["MainHandSlot"]==null)
                 {
                     equippedItems["MainHandSlot"] = item;
@@ -175,7 +162,7 @@ public class EquipmentData
                     return "You already have an item equipped to your main hand slot.";
                 }
 
-            case ItemData.equipableSlot.FINGER:  //Need logic here to check for empty finger slot
+            case ItemEntity.equipableSlot.FINGER:  //Need logic here to check for empty finger slot
                 if (equippedItems["MainHandRingSlot"] == null)
                 {
                     equippedItems["MainHandRingSlot"] = item;
@@ -193,7 +180,7 @@ public class EquipmentData
                     return "You don't have an empty ring finger to equip " + item.entityName;
                 }
 
-            case ItemData.equipableSlot.OFFHAND:
+            case ItemEntity.equipableSlot.OFFHAND:
                 if (equippedItems["OffHandSlot"] == null)
                 {
                     equippedItems["OffHandSlot"] = item;
@@ -205,7 +192,7 @@ public class EquipmentData
                     return "You already have an item equipped to your off hand slot.";
                 }
             
-            case ItemData.equipableSlot.NECK:
+            case ItemEntity.equipableSlot.NECK:
                 if (equippedItems["NeckSlot"] == null)
                 {
                     equippedItems["NeckSlot"] = item;
@@ -225,13 +212,13 @@ public class EquipmentData
         return "Could not equip " + item.entityName; 
     }
 
-    public ItemData UnequipItemFromSlot(string target)
+    public ItemEntity UnequipItemFromSlot(string target)
     {
         foreach (string slot in equippedItems.Keys)
         {
             if (equippedItems[slot].entityName.ToLower() == target)
             {
-                ItemData item = equippedItems[slot];
+                ItemEntity item = equippedItems[slot];
                 equippedItems[slot] = null;
                 return item;
             }
@@ -240,13 +227,13 @@ public class EquipmentData
         return null;
     }
 
-    public ItemData GetItemEquiped(string target)
+    public ItemEntity GetItemEquiped(string target)
     {
         foreach (string slot in equippedItems.Keys)
         {
             if (equippedItems[slot].entityName.ToLower() == target)
             {
-                ItemData item = equippedItems[slot];
+                ItemEntity item = equippedItems[slot];
                 return item;
             }
         }
@@ -254,13 +241,14 @@ public class EquipmentData
         return null;
     }
 
-    public void UpdateEquipmentModifiers(ItemData item, string command)
+    public void UpdateEquipmentModifiers(ItemEntity item, string command)
     {
         if (command == "add")
         {
             foreach (string modifier in item.itemModifiers.Keys)
             {
                 equipmentModifiers[modifier] += item.itemModifiers[modifier];
+                currentWeight += item.weight_kg;
             }
         }
 
@@ -269,6 +257,7 @@ public class EquipmentData
             foreach (string modifier in item.itemModifiers.Keys)
             {
                 equipmentModifiers[modifier] -= item.itemModifiers[modifier];
+                currentWeight -= item.weight_kg;
             }
         }
     }
@@ -289,7 +278,16 @@ public class EquipmentData
 
         foreach (string slot in equippedItems.Keys)
         {
-            messageToReturn += "\n" + slot + ": " + equippedItems[slot].entityName;
+            string[] cleanedString = slot.Split("Slot");
+
+            if (equippedItems[slot] != null)
+            {
+                messageToReturn += "\n" + cleanedString[0] + ": " + equippedItems[slot].entityName;
+            }
+            else
+            {
+                messageToReturn += "\n" + cleanedString[0] + ": [empty]";
+            }
         }
         
         return messageToReturn;

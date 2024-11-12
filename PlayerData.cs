@@ -42,9 +42,6 @@ public class PlayerData
     int playerRangeDamage;
     int playerMagicDamage;
     int playerArmor;
-    int playerHunger = 100;
-    int playerThirst = 100;
-    int playerSanity = 100;
     float maxCarryWeight;
 
     //Dynamic progression

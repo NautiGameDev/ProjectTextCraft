@@ -10,15 +10,21 @@ Create chunk at world coordinate, instantiate entities, and pass chunk to world 
 Populate entity list in GUI
 Update biome name and chunk coordinates in GUI.
 */
+
 public class World : MonoBehaviour
 {
     public Player player;
-    public List<BiomeData> biomeData = new List<BiomeData>();
 
     //Chunk handling
     Vector2Int worldCoordinates = new Vector2Int(0,0);
     WorldData worldData = new WorldData();
-    string currentBiome;
+    BiomeEntity currentBiome;
+
+    //Data
+    BiomeData biomeData = new BiomeData();
+    ItemData itemData = new ItemData();
+    NPCData npcData = new NPCData();
+    EnvironmentData environmentData = new EnvironmentData();
 
     //GUI Objects
     [SerializeField] TextMeshProUGUI biomeName;
@@ -33,47 +39,85 @@ public class World : MonoBehaviour
     
     void GenerateNewChunk()
     {
-        BiomeData newBiome = biomeData[0];
+        //Needs improved when implementing world generation
+        BiomeEntity currentBiome = new BiomeEntity(biomeData, "Dark Forest");
 
-        UpdateBiomeGUI(newBiome.biomeName);
-        currentBiome = newBiome.biomeName;
+        UpdateBiomeGUI(currentBiome.biomeName);
 
-        ChunkData currentChunk = new ChunkData(worldCoordinates, newBiome.biomeName, newBiome.descriptions);        
+        ChunkData currentChunk = new ChunkData(worldCoordinates, currentBiome);        
 
-        for (int i=0; i<newBiome.numb_enemiesToSpawn; i++)
+        //Populate NPCs in Chunk Data
+        for (int i=0; i < currentBiome.numbNPCObj; i++)
         {
-            if (UnityEngine.Random.value <= newBiome.enemySpawnChance)
+            float randFloat = UnityEngine.Random.value;
+            float highestChance = 1f;
+            string chosenNPC = "";
+
+            foreach (string npc in currentBiome.npcEntities)
             {
-                int randomChoice = UnityEngine.Random.Range(0, newBiome.enemyEntities.Count - 1);
-                NPCData newEnemy = newBiome.enemyEntities[randomChoice];
-                currentChunk.AddNPCToList(newEnemy);
+                string[] npcArray = npc.Split("%");
+
+                if (float.Parse(npcArray[1]) > randFloat && float.Parse(npcArray[1]) <= highestChance)
+                {
+                    highestChance = float.Parse(npcArray[1]);
+                    chosenNPC = npcArray[0];
+                }
+            }
+
+            if (chosenNPC != "")
+            {
+                NPCEntity newNPC = new NPCEntity(npcData, chosenNPC, this);
+                currentChunk.AddNPCToList(newNPC);
             }
         }
 
-        for (int j=0; j<newBiome.numb_npcToSpawn; j++)
+        //Populate Environment Objects in chunk data
+        for (int i=0; i < currentBiome.numbEnvironmentObj; i++)
         {
-            if (UnityEngine.Random.value <= newBiome.npcSpawnChance)
+            float randFloat = UnityEngine.Random.value;
+            float highestChance = 1f;
+            string chosenObj = "";
+
+            foreach (string obj in currentBiome.environmentEntities)
             {
-                int randomChoice = UnityEngine.Random.Range(0, newBiome.npcEntities.Count);
-                currentChunk.AddNPCToList(newBiome.npcEntities[randomChoice]);
+                string[] objArray = obj.Split("%");
+
+                if (float.Parse(objArray[1]) > randFloat && float.Parse(objArray[1]) <= highestChance)
+                {
+                    highestChance = float.Parse(objArray[1]);
+                    chosenObj = objArray[0];
+                }
+            }
+
+            if (chosenObj != "")
+            {
+                EnvironmentEntity newEnvironmentObj = new EnvironmentEntity(environmentData, chosenObj, this);
+                currentChunk.AddEnvironmentToList(newEnvironmentObj);
             }
         }
 
-        for (int i= 0; i<newBiome.numb_environmentalObjectsToSpawn; i++)
+        //Populate items in chunk data
+        for (int i=0; i < currentBiome.numbItemObj; i++)
         {
-            if (UnityEngine.Random.value <= newBiome.environmentSpawnChance)
-            {
-                int randomChoice = UnityEngine.Random.Range(0, newBiome.environmentEntities.Count);
-                currentChunk.AddEnvironmentToDictionary(newBiome.environmentEntities[randomChoice]);
-            }
-        }
+            float randFloat = UnityEngine.Random.value;
+            float highestChance = 1f;
+            string chosenItem = "";
 
-        for (int i=0; i<newBiome.numb_itemsToSpawn; i++)
-        {
-            if (UnityEngine.Random.value <= newBiome.itemSpawnChance)
+            foreach (string item in currentBiome.itemEntities)
             {
-                int randomChoice = UnityEngine.Random.Range(0, newBiome.itemEntities.Count);
-                currentChunk.AddItemToDictionary(newBiome.itemEntities[randomChoice]);
+                string[] itemArray = item.Split("%");
+
+                if (float.Parse(itemArray[1]) > randFloat && float.Parse(itemArray[1]) <= highestChance)
+                {
+                    highestChance = float.Parse(itemArray[1]);
+                    chosenItem = itemArray[0];
+                }
+            }
+
+            if (chosenItem != "")
+            {
+                ItemEntity newItem = new ItemEntity(itemData, chosenItem);
+                currentChunk.AddItemToList(newItem);
             }
         }
 
@@ -93,19 +137,19 @@ public class World : MonoBehaviour
     {
 
         entityList.text = "";
-        entityList.text += "Nauti\n"; //Player name, needs changed
+        entityList.text += "Nauti\n"; //Player name, needs changed when character creation is added
 
-        foreach (NPCData npc in chunk.storedNPCs)
+        foreach (NPCEntity npc in chunk.storedNPCs)
         {
             entityList.text += npc.entityName + "\n";
         }
 
-        foreach (EnvironmentData environmentObj in chunk.storedEnvironmentObj)
+        foreach (EnvironmentEntity environmentObj in chunk.storedEnvironmentObj)
         {
             entityList.text += environmentObj.entityName + "\n";
         }
 
-        foreach (ItemData item in chunk.storedItems)
+        foreach (ItemEntity item in chunk.storedItems)
         {
             entityList.text += item.entityName + "\n";
         }
@@ -127,12 +171,13 @@ public class World : MonoBehaviour
 
         try
         {
-            ChunkData chunk = worldData.GetChunkAtPosition(worldCoordinates);
-            UpdateBiomeGUI(chunk.biome);
+            ChunkData chunk = GetChunkAtWorldCoords();
+            UpdateBiomeGUI(chunk.biomeName);
             UpdateEntityList(chunk);
         }
         catch
         {
+            Debug.Log("Generating new chunk at " + coordMovement);
             GenerateNewChunk();
         }
     }
@@ -140,38 +185,45 @@ public class World : MonoBehaviour
     public void SetPosition(Vector2Int newPos)
     {
         worldCoordinates = newPos;
-        ChunkData chunk = worldData.GetChunkAtPosition(newPos);
-        UpdateBiomeGUI(chunk.biome);
+        ChunkData chunk = GetChunkAtWorldCoords();
+        UpdateBiomeGUI(chunk.biomeName);
         UpdateEntityList(chunk);
     }
+
+    public ItemEntity CreateItemFromData(string item)
+    {
+        ItemEntity newItem = new ItemEntity(itemData, item);
+        return newItem;
+    }
+
 #endregion
 
 #region Add/Remove Entities from chunk
-    public void AddItemToCurrentChunk(ItemData item)
+    public void AddItemToCurrentChunk(ItemEntity item)
     {
         ChunkData currentChunk = GetChunkAtWorldCoords();
-        currentChunk.AddItemToDictionary(item);
+        currentChunk.AddItemToList(item);
         UpdateEntityList(currentChunk);
     }
 
-    public void RemoveItemFromChunk(ItemData item)
+    public void RemoveItemFromChunk(ItemEntity item)
     {
         ChunkData currentChunk = GetChunkAtWorldCoords();
-        currentChunk.RemoveItemFromDictionary(item);
+        currentChunk.RemoveItemFromList(item);
         UpdateEntityList(currentChunk);
     }
 
-    public void AddNPCToChunk(NPCData npc)
+    public void AddNPCToChunk(NPCEntity npc)
     {
         ChunkData currentChunk = GetChunkAtWorldCoords();
         currentChunk.AddNPCToList(npc);
         UpdateEntityList(currentChunk);
     }
 
-    public void RemoveNPCFromChunk(NPCData npc)
+    public void RemoveNPCFromChunk(NPCEntity npc)
     {
         ChunkData currentChunk = GetChunkAtWorldCoords();
-        currentChunk.RemoveNPCFromDictionary(npc);
+        currentChunk.RemoveNPCFromList(npc);
         UpdateEntityList(currentChunk);
     }
 #endregion

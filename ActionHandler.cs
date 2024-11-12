@@ -296,14 +296,7 @@ public class ActionHandler : MonoBehaviour
                 target += parsedInput[1];
             }
 
-            try
-            {
-                appendedMessage += Action_AttackKill(target);
-            }
-            catch
-            {
-                appendedMessage += target + " doesn't seem to exist in your vicinity.";
-            }
+            appendedMessage += Action_AttackKill(target);
         }
         else
         {
@@ -431,10 +424,10 @@ public class ActionHandler : MonoBehaviour
 
         ChunkData currentChunk = world.GetChunkAtWorldCoords();
 
-        if (currentChunk.biome != previousBiomeDescribed)
+        if (currentChunk.biomeName != previousBiomeDescribed)
         {
-            previousBiomeDescribed = currentChunk.biome;
-            actionResponse += "into the " + currentChunk.biome + ". " + currentChunk.GetRandomDescription();
+            previousBiomeDescribed = currentChunk.biomeName;
+            actionResponse += "into the " + currentChunk.biomeName + ". " + currentChunk.GetRandomDescription();
         }
 
         return actionResponse;
@@ -450,20 +443,20 @@ public class ActionHandler : MonoBehaviour
         ChunkData currentChunk = world.GetChunkAtWorldCoords();
         string messageToReturn = "";
 
-        EnvironmentData environmentObj = GetEnvironmentObj(target, currentChunk);
+        EnvironmentEntity environmentObj = GetEnvironmentObj(target, currentChunk);
         
         //Check if target exists in current chunk
         if (environmentObj != null)
         {
             messageToReturn += environmentObj.GetGatherMessage();
-            ItemData lootedItem = environmentObj.GetItemFromInventory(); //Returns random ItemData from inventory array
+            ItemEntity lootedItem = environmentObj.GetItemFromInventory(); //Returns random ItemData from inventory array
             messageToReturn += lootedItem.GetGatherMessage();
             messageToReturn += player.AddItemToInventory(lootedItem);
             return messageToReturn;
 
         }
 
-        ItemData item = GetItemInWorld(target, currentChunk);
+        ItemEntity item = GetItemInWorld(target, currentChunk);
 
         if (item != null)
         {
@@ -474,7 +467,7 @@ public class ActionHandler : MonoBehaviour
 
         }
 
-        NPCData npc = GetNPC(target, currentChunk);
+        NPCEntity npc = GetNPC(target, currentChunk);
 
         if (npc != null)
         {
@@ -497,7 +490,7 @@ public class ActionHandler : MonoBehaviour
 
         ChunkData currentChunk = world.GetChunkAtWorldCoords();
 
-        EnvironmentData environmentObj = GetEnvironmentObj(target, currentChunk);
+        EnvironmentEntity environmentObj = GetEnvironmentObj(target, currentChunk);
 
         if (environmentObj != null)
         {
@@ -505,7 +498,7 @@ public class ActionHandler : MonoBehaviour
             return messageToReturn;
         }
 
-        ItemData itemInChunk = GetItemInWorld(target, currentChunk);
+        ItemEntity itemInChunk = GetItemInWorld(target, currentChunk);
 
         if (itemInChunk != null)
         {
@@ -513,7 +506,7 @@ public class ActionHandler : MonoBehaviour
             return messageToReturn;
         }
 
-        NPCData npc = GetNPC(target, currentChunk);
+        NPCEntity npc = GetNPC(target, currentChunk);
         
         if (npc != null)
         {
@@ -521,7 +514,7 @@ public class ActionHandler : MonoBehaviour
             return messageToReturn;
         }
 
-        ItemData itemInInventory = GetItemInInventory(target);
+        ItemEntity itemInInventory = GetItemInInventory(target);
 
         if (itemInInventory != null)
         {
@@ -529,7 +522,8 @@ public class ActionHandler : MonoBehaviour
             return messageToReturn;
         }
 
-        ItemData itemInEquipment = GetItemInEquipment(target);
+        ItemEntity itemInEquipment = GetItemInEquipment(target);
+        //Needs finished with check if null statement
 
 
         messageToReturn += "There doesn't seem to be a " + target + " in the area.";
@@ -546,7 +540,7 @@ public class ActionHandler : MonoBehaviour
 
         ChunkData currentChunk = world.GetChunkAtWorldCoords();
 
-        EnvironmentData environmentObj = GetEnvironmentObj(target, currentChunk);
+        EnvironmentEntity environmentObj = GetEnvironmentObj(target, currentChunk);
 
         if (environmentObj != null)
         {
@@ -554,7 +548,7 @@ public class ActionHandler : MonoBehaviour
             return messageToReturn;
         }
 
-        ItemData itemInChunk = GetItemInWorld(target, currentChunk);
+        ItemEntity itemInChunk = GetItemInWorld(target, currentChunk);
 
         if (itemInChunk != null)
         {
@@ -562,7 +556,7 @@ public class ActionHandler : MonoBehaviour
             return messageToReturn;
         }
 
-        NPCData npc = GetNPC(target, currentChunk);
+        NPCEntity npc = GetNPC(target, currentChunk);
         
         if (npc != null)
         {
@@ -570,7 +564,7 @@ public class ActionHandler : MonoBehaviour
             return messageToReturn;
         }
 
-        ItemData itemInInventory = GetItemInInventory(target);
+        ItemEntity itemInInventory = GetItemInInventory(target);
 
         if (itemInInventory != null)
         {
@@ -588,7 +582,7 @@ public class ActionHandler : MonoBehaviour
 
         ChunkData currentChunk = world.GetChunkAtWorldCoords();
 
-        EnvironmentData environmentObj = GetEnvironmentObj(target, currentChunk);
+        EnvironmentEntity environmentObj = GetEnvironmentObj(target, currentChunk);
 
         if (environmentObj != null)
         {
@@ -597,7 +591,7 @@ public class ActionHandler : MonoBehaviour
             return messageToReturn;
         }
 
-        ItemData itemInChunk = GetItemInWorld(target, currentChunk);
+        ItemEntity itemInChunk = GetItemInWorld(target, currentChunk);
 
         if (itemInChunk != null)
         {
@@ -606,17 +600,17 @@ public class ActionHandler : MonoBehaviour
             return messageToReturn;
         }
 
-        NPCData npc = GetNPC(target, currentChunk);
+        NPCEntity npc = GetNPC(target, currentChunk);
         
         if (npc != null)
         {
-            if (npc.currentState == NPCData.NPCState.ALIVE)
+            if (npc.currentState == NPCEntity.NPCState.ALIVE)
             {
-                
-                
+                Debug.Log("Attacking NPC Target Found: " + npc.entityName);
+
                 //Resolve player damage against NPC and append message
-                ItemData playerWeapon = player.GetEquippedItemInSlot("mainHand");
-                ItemData playerOffhand = player.GetEquippedItemInSlot("offHand");
+                ItemEntity playerWeapon = player.GetEquippedItemInSlot("MainHandSlot");
+                ItemEntity playerOffhand = player.GetEquippedItemInSlot("OffHandSlot");
                 
                 int rollDmg = 0;
                 int numbOfRolls = 0;
@@ -658,8 +652,9 @@ public class ActionHandler : MonoBehaviour
                 else
                 {
                     messageToReturn += "\nIt dies with a final breath, and its' lifeless corpse falls to the ground.";
-                    world.RemoveNPCFromChunk(npc);
-                    world.AddNPCToChunk(npc.corpseObj);
+                    npc.currentState = NPCEntity.NPCState.DEAD;
+                    npc.entityName += " Corpse";
+                    world.UpdateEntityList(world.GetChunkAtWorldCoords());
                     playerHealth = player.ResolveDamage(0);
                 }
 
@@ -685,7 +680,7 @@ public class ActionHandler : MonoBehaviour
             return messageToReturn;
         }
 
-        ItemData itemInInventory = GetItemInInventory(target);
+        ItemEntity itemInInventory = GetItemInInventory(target);
 
         if (itemInInventory != null)
         {
@@ -704,18 +699,18 @@ public class ActionHandler : MonoBehaviour
 
         ChunkData chunk = world.GetChunkAtWorldCoords();
 
-        NPCData npc = GetNPC(target, chunk);
+        NPCEntity npc = GetNPC(target, chunk);
 
         if (npc != null)
         {
-            if (npc.currentState == NPCData.NPCState.DEAD)
+            if (npc.currentState == NPCEntity.NPCState.DEAD)
             {
                 Debug.Log("Loot Target: " + target);
 
                 messageToReturn += npc.GetLootMessage();
-                List<ItemData> lootedItems = npc.GetRandomLoot();
+                List<ItemEntity> lootedItems = npc.GetRandomLoot();
 
-                foreach (ItemData item in lootedItems)
+                foreach (ItemEntity item in lootedItems)
                 {
                     messageToReturn += "\n" + player.AddItemToInventory(item);
                 }
@@ -742,14 +737,14 @@ public class ActionHandler : MonoBehaviour
         string messageToReturn = "";
 
 
-        ItemData itemInInventory = player.GetItemFromInventory(target);
+        ItemEntity itemInInventory = player.GetItemFromInventory(target);
 
-        if (itemInInventory != null && itemInInventory.entityType == ItemData.entTypes.EQUIPABLE)
+        if (itemInInventory != null && itemInInventory.entityType == ItemEntity.entTypes.EQUIPABLE)
         {
             messageToReturn += player.EquipItem(itemInInventory);
             player.RemoveItemFromInventory(target);
         }
-        else if (itemInInventory != null && itemInInventory.entityType != ItemData.entTypes.EQUIPABLE)
+        else if (itemInInventory != null && itemInInventory.entityType != ItemEntity.entTypes.EQUIPABLE)
         {
             messageToReturn += target + " cannot be equipped.";
         }
@@ -766,7 +761,7 @@ public class ActionHandler : MonoBehaviour
     {
         string messageToReturn = "";
 
-        ItemData item = player.UnequipItem(target);
+        ItemEntity item = player.UnequipItem(target);
 
         if (item != null)
         {
@@ -799,9 +794,9 @@ public class ActionHandler : MonoBehaviour
     }
 
 #region Get Entities
-    EnvironmentData GetEnvironmentObj(string target, ChunkData currentChunk)
+    EnvironmentEntity GetEnvironmentObj(string target, ChunkData currentChunk)
     {
-        EnvironmentData environmentObj = currentChunk.GetTargetEnvironmentObj(target);
+        EnvironmentEntity environmentObj = currentChunk.GetTargetEnvironmentObj(target);
 
         if (environmentObj != null)
         {
@@ -811,9 +806,9 @@ public class ActionHandler : MonoBehaviour
         return null;
     }
 
-    ItemData GetItemInWorld(string target, ChunkData currentChunk)
+    ItemEntity GetItemInWorld(string target, ChunkData currentChunk)
     {
-        ItemData item = currentChunk.GetTargetItem(target);
+        ItemEntity item = currentChunk.GetTargetItem(target);
 
         if (item != null)
         {
@@ -823,21 +818,21 @@ public class ActionHandler : MonoBehaviour
         return null;
     }
 
-    ItemData GetItemInInventory(string target)
+    ItemEntity GetItemInInventory(string target)
     {
-        ItemData item = player.GetItemFromInventory(target);
+        ItemEntity item = player.GetItemFromInventory(target);
         return item;
     }
 
-    ItemData GetItemInEquipment(string target)
+    ItemEntity GetItemInEquipment(string target)
     {
-        ItemData item = player.GetItemEquipped(target);
+        ItemEntity item = player.GetItemEquipped(target);
         return item;
     }
 
-    NPCData GetNPC(string target, ChunkData currentChunk)
+    NPCEntity GetNPC(string target, ChunkData currentChunk)
     {
-        NPCData NPC = currentChunk.GetTargetNPC(target);
+        NPCEntity NPC = currentChunk.GetTargetNPC(target);
 
         if (NPC != null)
             return NPC;

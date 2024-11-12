@@ -25,7 +25,7 @@ public class Player : MonoBehaviour
 
 #region Inventory Methods
 
-    public string AddItemToInventory(ItemData item)
+    public string AddItemToInventory(ItemEntity item)
     {
         //Test if item can be placed in inventory based on weight
         //If true return message informing player that item has been added
@@ -49,10 +49,10 @@ public class Player : MonoBehaviour
         playerInventory.RemoveItemInInventory(target);
     }
 
-    public ItemData GetItemFromInventory(string target)
+    public ItemEntity GetItemFromInventory(string target)
     {
         
-        ItemData item = playerInventory.GetItemInInventory(target);
+        ItemEntity item = playerInventory.GetItemInInventory(target);
         return item;
     }
 
@@ -64,21 +64,21 @@ public class Player : MonoBehaviour
 
 #region Equipment Methods
 
-    public string EquipItem(ItemData item)
+    public string EquipItem(ItemEntity item)
     {
         return playerEquipment.EquipItemToSlot(item);
     }
 
-    public ItemData UnequipItem(string target)
+    public ItemEntity UnequipItem(string target)
     {
-        ItemData item = playerEquipment.UnequipItemFromSlot(target);
+        ItemEntity item = playerEquipment.UnequipItemFromSlot(target);
         return item;
 
     }
 
-    public ItemData GetItemEquipped(string target)
+    public ItemEntity GetItemEquipped(string target)
     {
-        ItemData item = playerEquipment.GetItemEquiped(target);
+        ItemEntity item = playerEquipment.GetItemEquiped(target);
         return item;
     }
 
@@ -88,9 +88,9 @@ public class Player : MonoBehaviour
         return equippedItems;
     }
 
-    public ItemData GetEquippedItemInSlot(string slot)
+    public ItemEntity GetEquippedItemInSlot(string slot)
     {
-        ItemData item = playerEquipment.GetItemInSlot(slot);
+        ItemEntity item = playerEquipment.GetItemInSlot(slot);
 
         return item;
     }
